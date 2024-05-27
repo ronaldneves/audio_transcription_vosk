@@ -3,23 +3,36 @@ import wave
 import json 
 from vosk import Model, KaldiRecognizer
 from pydub import AudioSegment
+from pydub.utils import mediainfo
 
 def conversor_taxa_audio(original, convertido):
-    audio = AudioSegment.from_file(original)
-    audio = audio.set_frame_rate(16000).set_channels(1)
-    audio.export(convertido, format = "wav")
+    if not os.path.isfile(original):
+        print(f"Erro: o arquivo {original} não foi encontrado.")
+        return 
+
+    try:    
+        audio = AudioSegment.from_file(original)
+        audio = audio.set_frame_rate(16000).set_channels(1)
+        audio.export(convertido, format = "wav")
+        print(f"Arquivo convertido com sucesso: {convertido}")
+
+        info = mediainfo(convertido)
+        print(f"Amostragem do arquivo convertido: {info['sample_rate']}")
+        print(f"Canais do arquivo {convertido}: {info['channels']} ")
+    
+    except Exception as e:
+        print(f"Ocorreu um erro ao processar o arquivo: {e}")
 
 
-modelo_transcricao = ''
-audio_original = ''
-audio_saida = ''
+modelo_transcricao = 'model'
+audio_original = 'teste2.wav'
+audio_saida = 'output_teste_2.wav'
 
 conversor_taxa_audio(audio_original, audio_saida)
 
 if not os.path.exists(modelo_transcricao):
     print("Baixe o modelo de linguagem e coloque-o no diretório correto.")
     exit(1)
-
 
 try:    
     model = Model(modelo_transcricao)
